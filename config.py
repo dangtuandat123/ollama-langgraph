@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).parent.resolve()
 DOCUMENT_PATH = BASE_DIR / "document_rag.txt"
 
 # --- LLM configuration ---
-LLM_MODEL_NAME = "llama3.2"
+LLM_MODEL_NAME = "llama3.1:8b"
 EMBEDDING_MODEL_NAME = "mxbai-embed-large"
 LLM_TEMPERATURE = 0.7
 
