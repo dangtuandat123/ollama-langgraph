@@ -9,3 +9,6 @@ class AgentState(TypedDict, total=False):
     retrieved_docs: List[Any] 
     agent_response: Optional[str]
     final_response: Optional[FinalResponse]
+    planner_plan: Optional[str]
+    code_output: Optional[str]
+    agent_last: Optional[str]
