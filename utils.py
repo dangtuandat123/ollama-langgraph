@@ -35,7 +35,8 @@ def get_router_llm():
 def get_embedding_model():
     embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
     return embedding_model
-def invoke_with_retry(chain, payload, state, agent_label, reminder=None, max_attempts=3):
+
+def invoke_with_retry(chain, payload, state, agent_label, reminder=None, max_attempts=5):
     last_error: Exception | None = None
     for attempt in range(1, max_attempts + 1):
         try:
@@ -50,6 +51,7 @@ def invoke_with_retry(chain, payload, state, agent_label, reminder=None, max_att
                 break
             if reminder:
                 state["messages"].append(HumanMessage(content=reminder))
+            time.sleep(3)
         except ResponseError as exc:
             last_error = exc
             print_colored(
@@ -58,7 +60,7 @@ def invoke_with_retry(chain, payload, state, agent_label, reminder=None, max_att
             )
             if attempt == max_attempts:
                 break
-            time.sleep(min(2 ** (attempt - 1), 5))
+            time.sleep(3)
     if last_error:
         raise last_error
     raise RuntimeError(f"{agent_label} failed without returning a response.")
