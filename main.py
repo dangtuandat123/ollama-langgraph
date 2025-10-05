@@ -11,4 +11,4 @@ def run_app(user_input: str) -> AgentState:
     final_state = compiled_app.invoke(initial_state)
     return final_state
 
-print(run_app("tạo một đoạn code html giới thiệu trang web có đủ css, responsive như trang web của facebook")["final_response"].html)
+print(run_app("tạo một đoạn code html web game rắn săn mồi 3d, responsive")["final_response"].html)

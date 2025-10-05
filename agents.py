@@ -1,4 +1,4 @@
-from utils import get_embedding_model, get_llm, get_final_llm, get_router_llm, print_colored
+﻿from utils import get_embedding_model, get_llm, get_final_llm, get_router_llm, print_colored,invoke_with_retry
 from state import AgentState
 from prompts import (
     SYSTEM_PROMPT_ROUTER_AGENT,
@@ -9,6 +9,7 @@ from prompts import (
 
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 
 
 # start agent
@@ -22,7 +23,12 @@ def planner_agent(state: AgentState) -> AgentState:
         ]
     )
     chain = prompt | llm
-    response = chain.invoke({"messages": state["messages"]})
+    response = invoke_with_retry(
+        chain,
+        {"messages": state["messages"]},
+        state,
+        "Planner Agent",
+    )
     state["messages"].append(response)
     state["agent_response"] = response.content
     state["planner_plan"] = response.content
@@ -30,10 +36,8 @@ def planner_agent(state: AgentState) -> AgentState:
     print_colored(f"Planner Agent Response:\n {response.content}", "yellow")
     return state
 
-
 def code_agent(state: AgentState) -> AgentState:
     print_colored("Code Agent Invoked", "green")
-
     llm = get_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -46,15 +50,18 @@ def code_agent(state: AgentState) -> AgentState:
         ]
     )
     chain = prompt | llm
-    response = chain.invoke({"messages": state["messages"]})
+    response = invoke_with_retry(
+        chain,
+        {"messages": state["messages"]},
+        state,
+        "Code Agent",
+    )
     state["messages"].append(response)
     state["agent_response"] = response.content
     state["code_output"] = response.content
     state["agent_last"] = "code_agent"
     print_colored(f"Code Agent Response:\n {response.content}", "yellow")
     return state
-
-
 # end agent
 def final_agent(state: AgentState) -> AgentState:
     print_colored("Final Agent Invoked", "green")
@@ -71,7 +78,13 @@ def final_agent(state: AgentState) -> AgentState:
         ]
     )
     chain = prompt | llm
-    response = chain.invoke({"messages": state["messages"]})
+    response = invoke_with_retry(
+        chain,
+        {"messages": state["messages"]},
+        state,
+        "Final Agent",
+        reminder="Please resend the final response using the expected JSON schema.",
+    )
     state["final_response"] = response
     state["agent_last"] = "final_agent"
 
@@ -85,10 +98,8 @@ def final_agent(state: AgentState) -> AgentState:
     print_colored(f"Final Agent Response:\n {response}", "yellow")
     return state
 
-
 def router_agent(state: AgentState) -> AgentState:
     print_colored("Router Agent Invoked", "green")
-
     llm = get_router_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -101,11 +112,15 @@ def router_agent(state: AgentState) -> AgentState:
         ]
     )
     chain = prompt | llm
-    response = chain.invoke(
+    response = invoke_with_retry(
+        chain,
         {
             "messages": state["messages"],
             "agent_last": state.get("agent_last", "unknown"),
-        }
+        },
+        state,
+        "Router Agent",
+        reminder="Vui lòng trả JSON đúng schema RouterResponse.",
     )
     state["route_decision"] = response
     decision_summary = (
@@ -117,3 +132,11 @@ def router_agent(state: AgentState) -> AgentState:
     state["agent_last"] = "router_agent"
     print_colored(f"Router Agent Response:\n {response}", "yellow")
     return state
+
+
+
+
+
+
+
+

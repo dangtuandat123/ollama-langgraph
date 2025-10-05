@@ -3,6 +3,10 @@ from langchain_ollama import OllamaEmbeddings
 from typing import List, Optional, Any, Literal
 from pydantic import BaseModel, Field
 from colorama import Fore, Style, init
+from ollama._types import ResponseError
+from langchain_core.exceptions import OutputParserException
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+import time
 
 from config import LLM_MODEL_NAME, EMBEDDING_MODEL_NAME, LLM_TEMPERATURE
 
@@ -31,6 +35,34 @@ def get_router_llm():
 def get_embedding_model():
     embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
     return embedding_model
+def invoke_with_retry(chain, payload, state, agent_label, reminder=None, max_attempts=3):
+    last_error: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return chain.invoke(payload)
+        except OutputParserException as exc:
+            last_error = exc
+            print_colored(
+                f"{agent_label} structured output error on attempt {attempt}: {exc}",
+                "red",
+            )
+            if attempt == max_attempts:
+                break
+            if reminder:
+                state["messages"].append(HumanMessage(content=reminder))
+        except ResponseError as exc:
+            last_error = exc
+            print_colored(
+                f"{agent_label} API error on attempt {attempt}: {exc}",
+                "red",
+            )
+            if attempt == max_attempts:
+                break
+            time.sleep(min(2 ** (attempt - 1), 5))
+    if last_error:
+        raise last_error
+    raise RuntimeError(f"{agent_label} failed without returning a response.")
+
 
 def print_colored(text: str, color: str = "green") -> None:
 
