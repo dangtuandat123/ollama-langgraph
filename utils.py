@@ -2,6 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
 from typing import List, Optional, Any, Literal
 from pydantic import BaseModel, Field
+from colorama import Fore, Style, init
 
 from config import LLM_MODEL_NAME, EMBEDDING_MODEL_NAME, LLM_TEMPERATURE
 
@@ -30,3 +31,20 @@ def get_router_llm():
 def get_embedding_model():
     embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
     return embedding_model
+
+def print_colored(text: str, color: str = "green") -> None:
+
+    init(autoreset=True) 
+
+    color_dict = {
+        "red": Fore.RED,
+        "green": Fore.GREEN,
+        "yellow": Fore.YELLOW,
+        "blue": Fore.BLUE,
+        "magenta": Fore.MAGENTA,
+        "cyan": Fore.CYAN,
+        "white": Fore.WHITE,
+    }
+
+    chosen_color = color_dict.get(color.lower(), Fore.GREEN) 
+    print(f"{chosen_color}{text}{Style.RESET_ALL}")

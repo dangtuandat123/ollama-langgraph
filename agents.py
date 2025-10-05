@@ -1,4 +1,4 @@
-from utils import get_embedding_model, get_llm, get_final_llm, get_router_llm
+from utils import get_embedding_model, get_llm, get_final_llm, get_router_llm, print_colored
 from state import AgentState
 from prompts import (
     SYSTEM_PROMPT_ROUTER_AGENT,
@@ -13,7 +13,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # start agent
 def planner_agent(state: AgentState) -> AgentState:
-    print("Planner Agent Invoked")
+    print_colored("Planner Agent Invoked", "green")
     llm = get_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -27,11 +27,13 @@ def planner_agent(state: AgentState) -> AgentState:
     state["agent_response"] = response.content
     state["planner_plan"] = response.content
     state["agent_last"] = "planner_agent"
+    print_colored(f"Planner Agent Response:\n {response.content}", "yellow")
     return state
 
 
 def code_agent(state: AgentState) -> AgentState:
-    print("Code Agent Invoked")
+    print_colored("Code Agent Invoked", "green")
+
     llm = get_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -49,12 +51,14 @@ def code_agent(state: AgentState) -> AgentState:
     state["agent_response"] = response.content
     state["code_output"] = response.content
     state["agent_last"] = "code_agent"
+    print_colored(f"Code Agent Response:\n {response.content}", "yellow")
     return state
 
 
 # end agent
 def final_agent(state: AgentState) -> AgentState:
-    print("Final Agent Invoked")
+    print_colored("Final Agent Invoked", "green")
+
     llm = get_final_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -78,11 +82,13 @@ def final_agent(state: AgentState) -> AgentState:
         summary_chunks.append(f"HTML Output:\n{response.html}")
     if summary_chunks:
         state["messages"].append(AIMessage(content="\n\n".join(summary_chunks)))
+    print_colored(f"Final Agent Response:\n {response}", "yellow")
     return state
 
 
 def router_agent(state: AgentState) -> AgentState:
-    print("Router Agent Invoked")
+    print_colored("Router Agent Invoked", "green")
+
     llm = get_router_llm()
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -109,4 +115,5 @@ def router_agent(state: AgentState) -> AgentState:
         decision_summary += f" Lý do: {response.reason}"
     state["messages"].append(AIMessage(content=decision_summary))
     state["agent_last"] = "router_agent"
+    print_colored(f"Router Agent Response:\n {response}", "yellow")
     return state
