@@ -12,8 +12,8 @@ class FinalResponse(BaseModel):
     html: Optional[str] = Field(description="Nội dung HTML.")
    
 class RouterResponse(BaseModel):
-    agent_current: Literal["code_agent", "final_agent"] = Field(description="agent_current")
-    next_agent: Literal["final_agent", "code_agent"] = Field(description="next_agent")
+    agent_current: Literal["planner_agent", "code_agent", "final_agent", "router_agent"] = Field(description="agent hiện tại đang thực thi.")
+    next_agent: Literal["final_agent", "code_agent"] = Field(description="agent tiếp theo sẽ thực hiện.")
     reason: Optional[str] = Field(description="Lý do chuyển đổi agent, nếu có.")
 
 def get_llm():
