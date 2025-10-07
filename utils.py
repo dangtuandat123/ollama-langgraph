@@ -7,6 +7,7 @@ from ollama._types import ResponseError
 from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 import time
+from tools import tool
 
 from config import LLM_MODEL_NAME, EMBEDDING_MODEL_NAME, LLM_TEMPERATURE
 
@@ -31,6 +32,10 @@ def get_final_llm():
 def get_router_llm():
     llm = ChatOllama(model=LLM_MODEL_NAME, temperature=0)
     return llm.with_structured_output(RouterResponse)
+
+def get_llm_with_tools(tools: List[Any]):
+    llm = ChatOllama(model=LLM_MODEL_NAME, temperature=LLM_TEMPERATURE)
+    return llm.bind_tools(tools)
 
 def get_embedding_model():
     embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
