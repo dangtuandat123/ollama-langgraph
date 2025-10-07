@@ -1,7 +1,6 @@
 from graph import compiled_app
 from langchain_core.messages import HumanMessage, BaseMessage
 
-from graph import compiled_app
 from state import AgentState
 def run_app(user_input: str) -> AgentState:
     initial_state: AgentState = {
