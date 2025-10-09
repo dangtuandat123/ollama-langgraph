@@ -131,7 +131,7 @@ def router_agent(state: AgentState) -> AgentState:
         "Router Agent",
         reminder="Vui lòng trả JSON đúng schema RouterResponse.",
     )
-    state["route_decision"] = response
+    state["route_response"] = response
     decision_summary = (
         f"Router quyết định chuyển từ {response.agent_current} sang {response.next_agent}."
     )

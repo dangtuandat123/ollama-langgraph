@@ -7,8 +7,6 @@ from ollama._types import ResponseError
 from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 import time
-from tools import tool
-
 from config import LLM_MODEL_NAME, EMBEDDING_MODEL_NAME, LLM_TEMPERATURE
 
 

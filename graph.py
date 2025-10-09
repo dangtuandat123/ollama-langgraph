@@ -4,9 +4,9 @@ from agents import planner_agent, code_agent, final_agent, router_agent
 from IPython.display import Image, display
 
 def condition_for_code_agent(state: AgentState) -> bool:
-    reason = state['route_decision'].reason or ''
-    print(f"Condition Check - Route Decision:{state['route_decision'].reason}, Next Agent: {state['route_decision'].next_agent}")
-    return state["route_decision"].next_agent
+    reason = state['route_response'].reason or ''
+    print(f"Condition Check - Route Decision:{state['route_response'].reason}, Next Agent: {state['route_response'].next_agent}")
+    return state["route_response"].next_agent
 
 
 def build_graph() -> StateGraph[AgentState]:

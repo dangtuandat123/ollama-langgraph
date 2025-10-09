@@ -14,7 +14,7 @@ class RouterResponse(BaseModel):
 
 class AgentState(TypedDict, total=False):
     messages: List[BaseMessage]
-    route_decision: RouterResponse
+    route_response: RouterResponse
     retrieved_docs: List[Any] 
     agent_response: Optional[str]
     final_response: Optional[FinalResponse]
