@@ -1,12 +1,20 @@
-﻿from utils import get_embedding_model, get_llm, get_final_llm, get_router_llm, print_colored,invoke_with_retry
-from state import AgentState
+﻿from utils import (
+    get_embedding_model, 
+    get_llm, 
+    print_colored,
+    invoke_with_retry
+)
+from state import (
+    AgentState,
+    FinalResponse,
+    RouterResponse
+)
 from prompts import (
     SYSTEM_PROMPT_ROUTER_AGENT,
     SYSTEM_PROMPT_PLANNER_AGENT,
     SYSTEM_PROMPT_FINAL_AGENT,
     SYSTEM_PROMPT_CODE_AGENT,
 )
-
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
@@ -62,11 +70,12 @@ def code_agent(state: AgentState) -> AgentState:
     state["agent_last"] = "code_agent"
     print_colored(f"Code Agent Response:\n {response.content}", "yellow")
     return state
+
 # end agent
 def final_agent(state: AgentState) -> AgentState:
     print_colored("Final Agent Invoked", "green")
 
-    llm = get_final_llm()
+    llm = get_llm(model=FinalResponse)
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", SYSTEM_PROMPT_FINAL_AGENT),
@@ -100,7 +109,7 @@ def final_agent(state: AgentState) -> AgentState:
 
 def router_agent(state: AgentState) -> AgentState:
     print_colored("Router Agent Invoked", "green")
-    llm = get_router_llm()
+    llm = get_llm(model=RouterResponse)
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", SYSTEM_PROMPT_ROUTER_AGENT),

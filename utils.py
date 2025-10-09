@@ -12,31 +12,22 @@ from tools import tool
 from config import LLM_MODEL_NAME, EMBEDDING_MODEL_NAME, LLM_TEMPERATURE
 
 
-class FinalResponse(BaseModel):
-    message: Optional[str] = Field(description="Lời giải thích ngắn gọn, thân thiện dành cho người dùng.")
-    html: Optional[str] = Field(description="Nội dung HTML.")
-   
-class RouterResponse(BaseModel):
-    agent_current: Literal["planner_agent", "code_agent", "final_agent", "router_agent"] = Field(description="agent hiện tại đang thực thi.")
-    next_agent: Literal["final_agent", "code_agent"] = Field(description="agent tiếp theo sẽ thực hiện.")
-    reason: Optional[str] = Field(description="Lý do chuyển đổi agent, nếu có.")
 
-def get_llm():
+    
+def get_llm(model: BaseModel = None, tools: List[Any] = None):
     llm = ChatOllama(model=LLM_MODEL_NAME, temperature=LLM_TEMPERATURE)
+    
+    if model and tools:
+        return llm.bind_tools(tools) 
+    elif model:
+        return llm.with_structured_output(model)
+    elif tools:
+        return llm.bind_tools(tools)
     return llm
 
-def get_final_llm():
-    llm = ChatOllama(model=LLM_MODEL_NAME, temperature=0)
-    return llm.with_structured_output(FinalResponse)
 
-def get_router_llm():
-    llm = ChatOllama(model=LLM_MODEL_NAME, temperature=0)
-    return llm.with_structured_output(RouterResponse)
-
-def get_llm_with_tools(tools: List[Any]):
-    llm = ChatOllama(model=LLM_MODEL_NAME, temperature=LLM_TEMPERATURE)
-    return llm.bind_tools(tools)
-
+    
+    
 def get_embedding_model():
     embedding_model = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
     return embedding_model
